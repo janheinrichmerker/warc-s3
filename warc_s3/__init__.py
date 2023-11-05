@@ -6,7 +6,8 @@ from gzip import GzipFile
 from itertools import chain
 from pathlib import Path
 from tempfile import TemporaryFile
-from typing import IO, NamedTuple, Iterable, Iterator, TYPE_CHECKING, Any
+from typing import IO, NamedTuple, Iterable, Iterator, TYPE_CHECKING, Any, \
+    Optional, Sequence
 from uuid import uuid4
 from warnings import warn
 
@@ -39,7 +40,7 @@ class WarcS3Record(NamedTuple):
 
 class _WarcS3Record(NamedTuple):
     record: WarcRecord
-    location: WarcS3Location | None
+    location: Optional[WarcS3Location]
 
 
 def _write_records(
@@ -95,9 +96,9 @@ def _write_records(
 @dataclass(frozen=True)
 class WarcS3Store(AbstractContextManager):
     bucket_name: str
-    endpoint_url: str | None = None
-    access_key: str | None = None
-    secret_key: str | None = None
+    endpoint_url: Optional[str] = None
+    access_key: Optional[str] = None
+    secret_key: Optional[str] = None
     max_file_size: int = _DEFAULT_MAX_FILE_SIZE
     """
     Maximum number of bytes to write to a single WARC file.
@@ -163,7 +164,7 @@ class WarcS3Store(AbstractContextManager):
 
     def write(self, records: Iterable[WarcRecord]) -> Iterator[WarcS3Record]:
         records = iter(records)
-        head: list[WarcRecord]
+        head: Sequence[WarcRecord]
         head, records = spy(records)
         while len(head) > 0:
             with TemporaryFile() as tmp_file:
