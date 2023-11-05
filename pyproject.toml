@@ -1,0 +1,77 @@
+[project]
+name = "warc-s3"
+authors = [
+    {name = "Jan Heinrich Reimer", email = "heinrich.reimer@uni-jena.de"},
+]
+description = "Scalable and easy WARC records storage on S3."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "boto3~=1.28",
+    "importlib-metadata~=6.8",
+    "more-itertools~=10.1",
+    "tqdm~=4.66",
+    "warcio~=1.7",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+tests =[
+    "bandit[toml]~=1.7",
+    "boto3-stubs[s3]~=1.28",
+    "flake8~=6.1",
+    "mypy~=1.6",
+    "pylint~=3.0",
+    "pytest~=7.2",
+    "pytest-cov~=4.0",
+    "types-tqdm~=4.66",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/heinrichreimer/warc-s3"
+"Bug Tracker" = "https://github.com/heinrichreimer/warc-s3/issues"
+
+[build-system]
+requires = ["setuptools>=50", "setuptools_scm[toml]>=6.2", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["warc_s3"]
+namespaces = false
+
+[tool.setuptools.package-data]
+mypkg = ["*.txt", "*.md", "*.rst"]
+
+[tool.setuptools_scm]
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.pylint.messages_control]
+disable = [
+    "C",
+    "R",
+    "fixme",
+    "logging-fstring-interpolation"
+]
+
+[tool.bandit.assert_used]
+skips = ["**/test_*.py"]
+
+[tool.pytest.ini_options]
+log_cli = "True"
