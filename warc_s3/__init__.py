@@ -3,7 +3,7 @@ from contextlib import AbstractContextManager, contextmanager
 from dataclasses import dataclass
 from functools import cached_property
 from gzip import GzipFile
-from itertools import chain
+from itertools import islice
 from pathlib import Path
 from tempfile import TemporaryFile
 from typing import IO, NamedTuple, Iterable, Iterator, TYPE_CHECKING, Any, \
@@ -24,7 +24,8 @@ else:
 
 _S3CFG_PATH = Path("~/.s3cfg").expanduser()
 
-_DEFAULT_MAX_FILE_SIZE = 1_000_000_000  # 1GB
+_DEFAULT_MAX_FILE_SIZE: int = 1_000_000_000  # 1GB
+_DEFAULT_MAX_FILE_RECORDS: Optional[int] = None
 
 
 class WarcS3Location(NamedTuple):
@@ -47,7 +48,8 @@ def _write_records(
         records: Iterable[WarcRecord],
         file: IO[bytes],
         key: str,
-        max_size: int,
+        max_file_size: int,
+        max_file_records: Optional[int],
 ) -> Iterator[_WarcS3Record]:
     # Write WARC info record.
     with GzipFile(fileobj=file, mode="wb") as gzip_file:
@@ -57,10 +59,14 @@ def _write_records(
         writer.write_record(warc_info_record)
 
     # Warn about low max file size.
-    if file.tell() * 2 > max_size:
-        warn(UserWarning(f"Very low max file size: {max_size} bytes"))
+    if file.tell() * 2 > max_file_size:
+        warn(UserWarning(f"Very low max file size: {max_file_size} bytes"))
 
-    for record in records:
+    if max_file_records is None:
+        records_slice = records
+    else:
+        records_slice = islice(records, max_file_records)
+    for record in records_slice:
         offset = file.tell()
         with TemporaryFile() as tmp_file:
             # Write record to temporary file.
@@ -72,8 +78,10 @@ def _write_records(
             tmp_file.seek(0)
 
             # Check if record does not into file.
-            if offset + length > max_size:
-                records = chain([record], records)
+            if offset + length > max_file_size:
+                # Does not fit, so break and return all remaining records
+                # without location.
+                yield _WarcS3Record(record=record, location=None)
                 break
 
             # Write temporary file to file.
@@ -102,6 +110,11 @@ class WarcS3Store(AbstractContextManager):
     max_file_size: int = _DEFAULT_MAX_FILE_SIZE
     """
     Maximum number of bytes to write to a single WARC file.
+    """
+    max_file_records: Optional[int] = _DEFAULT_MAX_FILE_RECORDS
+    """
+    Maximum number of WARC records to write to a single WARC file.
+    No limit is imposed if set to None.
     """
     quiet: bool = False
     """
@@ -178,7 +191,8 @@ class WarcS3Store(AbstractContextManager):
                     records=records,
                     file=tmp_file,
                     key=key,
-                    max_size=self.max_file_size
+                    max_file_size=self.max_file_size,
+                    max_file_records=self.max_file_records,
                 )
                 # noinspection PyTypeChecker
                 offset_records = tqdm(
