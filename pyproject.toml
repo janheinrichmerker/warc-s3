@@ -20,7 +20,7 @@ classifiers = [
 ]
 dependencies = [
     "boto3~=1.28",
-    "importlib-metadata~=6.8",
+    "importlib-metadata>=6.8,<8.0",
     "more-itertools~=10.1",
     "tqdm~=4.66",
     "warcio~=1.7",
