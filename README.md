@@ -1,11 +1,11 @@
 [![PyPi](https://img.shields.io/pypi/v/warc-s3?style=flat-square)](https://pypi.org/project/warc-s3/)
-[![CI](https://img.shields.io/github/actions/workflow/status/heinrichreimer/warc-s3/ci.yml?branch=main&style=flat-square)](https://github.com/heinrichreimer/warc-s3/actions/workflows/ci.yml)
-[![Code coverage](https://img.shields.io/codecov/c/github/heinrichreimer/warc-s3?style=flat-square)](https://codecov.io/github/heinrichreimer/warc-s3/)
+[![CI](https://img.shields.io/github/actions/workflow/status/janheinrichmerker/warc-s3/ci.yml?branch=main&style=flat-square)](https://github.com/janheinrichmerker/warc-s3/actions/workflows/ci.yml)
+[![Code coverage](https://img.shields.io/codecov/c/github/janheinrichmerker/warc-s3?style=flat-square)](https://codecov.io/github/janheinrichmerker/warc-s3/)
 [![Python](https://img.shields.io/pypi/pyversions/warc-s3?style=flat-square)](https://pypi.org/project/warc-s3/)
-[![Issues](https://img.shields.io/github/issues/heinrichreimer/warc-s3?style=flat-square)](https://github.com/heinrichreimer/warc-s3/issues)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/heinrichreimer/warc-s3?style=flat-square)](https://github.com/heinrichreimer/warc-s3/commits)
+[![Issues](https://img.shields.io/github/issues/janheinrichmerker/warc-s3?style=flat-square)](https://github.com/janheinrichmerker/warc-s3/issues)
+[![Commit activity](https://img.shields.io/github/commit-activity/m/janheinrichmerker/warc-s3?style=flat-square)](https://github.com/janheinrichmerker/warc-s3/commits)
 [![Downloads](https://img.shields.io/pypi/dm/warc-s3?style=flat-square)](https://pypi.org/project/warc-s3/)
-[![License](https://img.shields.io/github/license/heinrichreimer/warc-s3?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/github/license/janheinrichmerker/warc-s3?style=flat-square)](LICENSE)
 
 # 💾 warc-s3
 
@@ -64,7 +64,7 @@ python -m build
 
 ## Support
 
-If you hit any problems using this package, please file an [issue](https://github.com/heinrichreimer/warc-s3/issues/new).
+If you hit any problems using this package, please file an [issue](https://github.com/janheinrichmerker/warc-s3/issues/new).
 We're happy to help!
 
 ## License
