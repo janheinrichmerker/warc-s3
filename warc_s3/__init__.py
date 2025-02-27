@@ -76,6 +76,8 @@ def _write_records(
     else:
         records_slice = islice(records, max_file_records)
     for record in records_slice:
+        record_buffer: list[_WarcS3Record] = []
+
         offset = file.tell()
         with TemporaryFile() as tmp_file:
             # Write record to temporary file.
@@ -90,7 +92,7 @@ def _write_records(
             if offset + length > max_file_size:
                 # Does not fit, so break and return all remaining records
                 # without location.
-                yield _WarcS3Record(record=record, location=None)
+                record_buffer.append(_WarcS3Record(record=record, location=None))
                 break
 
             # Write temporary file to file.
@@ -104,7 +106,9 @@ def _write_records(
                     length=length,
                 ),
             )
-            yield rec
+            record_buffer.append(rec)
+
+        yield from record_buffer
 
     for record in records:
         yield _WarcS3Record(record=record, location=None)
