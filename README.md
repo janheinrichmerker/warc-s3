@@ -12,6 +12,7 @@
 Scalable and easy WARC records storage on S3.
 
 ## Installation
+
 Install the package from PyPI:
 
 ```shell
@@ -32,24 +33,19 @@ pip install build setuptools wheel
 
 (On most systems, these packages are already pre-installed.)
 
-### Installation
-
-Install package and test dependencies:
+Then, install the package and test dependencies:
 
 ```shell
 pip install -e .[tests]
 ```
 
-### Testing
-
-Verify your changes against the test suite to verify.
+You can now verify your changes against the test suite.
 
 ```shell
-flake8 warc_s3  # Code format
-mypy warc_s3    # Static typing
-pylint warc_s3  # LINT errors
-bandit -c pyproject.toml -r warc_s3  # Security
-pytest warc_s3  # Unit tests
+ruff check .                   # Code format and LINT
+mypy .                         # Static typing
+bandit -c pyproject.toml -r .  # Security
+pytest .                       # Unit tests
 ```
 
 Please also add tests for your newly developed code.
