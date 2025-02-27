@@ -57,11 +57,9 @@ exclude = [
     "build",
     "venv",
 ]
-include = ["warc_s3"]
-namespaces = false
 
 [tool.setuptools.package-data]
-mypkg = ["*.txt", "*.md", "*.rst"]
+"*" = ["*.txt", "*.md", "*.rst"]
 
 [tool.setuptools_scm]
 
