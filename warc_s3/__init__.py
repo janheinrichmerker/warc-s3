@@ -15,6 +15,7 @@ from typing import (
     Any,
     Optional,
     Sequence,
+    MutableSequence,
 )
 from uuid import uuid4
 from warnings import warn
@@ -76,7 +77,7 @@ def _write_records(
     else:
         records_slice = islice(records, max_file_records)
     for record in records_slice:
-        record_buffer: list[_WarcS3Record] = []
+        record_buffer: MutableSequence[_WarcS3Record] = []
 
         offset = file.tell()
         with TemporaryFile() as tmp_file:
