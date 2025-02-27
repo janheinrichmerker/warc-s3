@@ -6,8 +6,16 @@ from gzip import GzipFile
 from itertools import islice
 from pathlib import Path
 from tempfile import TemporaryFile
-from typing import IO, NamedTuple, Iterable, Iterator, TYPE_CHECKING, Any, \
-    Optional, Sequence
+from typing import (
+    IO,
+    NamedTuple,
+    Iterable,
+    Iterator,
+    TYPE_CHECKING,
+    Any,
+    Optional,
+    Sequence,
+)
 from uuid import uuid4
 from warnings import warn
 
@@ -45,17 +53,18 @@ class _WarcS3Record(NamedTuple):
 
 
 def _write_records(
-        records: Iterable[WarcRecord],
-        file: IO[bytes],
-        key: str,
-        max_file_size: int,
-        max_file_records: Optional[int],
+    records: Iterable[WarcRecord],
+    file: IO[bytes],
+    key: str,
+    max_file_size: int,
+    max_file_records: Optional[int],
 ) -> Iterator[_WarcS3Record]:
     # Write WARC info record.
     with GzipFile(fileobj=file, mode="wb") as gzip_file:
         writer = WARCWriter(gzip_file, gzip=False)
         warc_info_record: WarcRecord = writer.create_warcinfo_record(
-            filename=key, info={})
+            filename=key, info={}
+        )
         writer.write_record(warc_info_record)
 
     # Warn about low max file size.
@@ -225,10 +234,7 @@ class WarcS3Store(AbstractContextManager):
                     record=offset_record.record,
                     location=offset_record.location,
                 )
-            records = (
-                offset_record.record
-                for offset_record in unsaved_records
-            )
+            records = (offset_record.record for offset_record in unsaved_records)
             head, records = spy(records)
 
     @contextmanager
