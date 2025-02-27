@@ -5,7 +5,7 @@ on:
 
 jobs:
   python-build:
-    name: "🏗️ Build Python wheels"
+    name: 🏗️ Build Python wheels
     strategy:
       matrix:
         python:
@@ -16,21 +16,21 @@ jobs:
         - "3.12"
     runs-on: ubuntu-latest
     steps:
-    - name: "📥 Check-out"
+    - name: 📥 Check-out
       uses: actions/checkout@v4
-    - name: "🧰 Install Python"
+    - name: 🧰 Install Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
         cache: pip
         cache-dependency-path: pyproject.toml
-    - name: "🧰 Install dependencies"
+    - name: 🧰 Install dependencies
       run: pip install build twine
-    - name: "🏗️ Build Python wheels"
+    - name: 🏗️ Build Python wheels
       run: python -m build
-    - name: "🧪 Check package bundles"
+    - name: 🧪 Check package bundles
       run: twine check dist/*
-    - name: "📤 Upload Python wheels"
+    - name: 📤 Upload Python wheels
       uses: actions/upload-artifact@v4
       if: matrix.python == '3.12'
       with:
@@ -59,7 +59,7 @@ jobs:
     - name: 🔍 Check Python code
       run: ruff check .
   python-typing:
-    name: "🔍 Check Python static typing"
+    name: 🔍 Check Python static typing
     strategy:
       matrix:
         python:
@@ -70,22 +70,22 @@ jobs:
         - "3.12"
     runs-on: ubuntu-latest
     steps:
-    - name: "📥 Check-out"
+    - name: 📥 Check-out
       uses: actions/checkout@v4
-    - name: "🧰 Install Protoc"
+    - name: 🧰 Install Protoc
       run: sudo apt install protobuf-compiler
-    - name: "🧰 Install Python"
+    - name: 🧰 Install Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
         cache: pip
         cache-dependency-path: pyproject.toml
-    - name: "🧰 Install dependencies"
+    - name: 🧰 Install dependencies
       run: pip install .[tests]
-    - name: "🔍 Check Python static typing"
+    - name: 🔍 Check Python static typing
       run: mypy .
   python-security:
-    name: "🔍 Check Python code security"
+    name: 🔍 Check Python code security
     strategy:
       matrix:
         python:
@@ -96,22 +96,22 @@ jobs:
         - "3.12"
     runs-on: ubuntu-latest
     steps:
-    - name: "📥 Check-out"
+    - name: 📥 Check-out
       uses: actions/checkout@v4
-    - name: "🧰 Install Protoc"
+    - name: 🧰 Install Protoc
       run: sudo apt install protobuf-compiler
-    - name: "🧰 Install Python"
+    - name: 🧰 Install Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
         cache: pip
         cache-dependency-path: pyproject.toml
-    - name: "🧰 Install dependencies"
+    - name: 🧰 Install dependencies
       run: pip install .[tests]
-    - name: "🔍 Check Python code security"
+    - name: 🔍 Check Python code security
       run: bandit -c pyproject.toml -r .
   python-test:
-    name: "🧪 Test Python code"
+    name: 🧪 Test Python code
     strategy:
       matrix:
         python:
@@ -122,25 +122,25 @@ jobs:
         - "3.12"
     runs-on: ubuntu-latest
     steps:
-    - name: "📥 Check-out"
+    - name: 📥 Check-out
       uses: actions/checkout@v4
-    - name: "🧰 Install Python"
+    - name: 🧰 Install Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python }}
         cache: pip
         cache-dependency-path: pyproject.toml
-    - name: "🧰 Install dependencies"
+    - name: 🧰 Install dependencies
       run: pip install .[tests]
-    - name: "🧪 Test Python code"
+    - name: 🧪 Test Python code
       run: pytest --cov --cov-report=xml .
-    - name: "📤 Upload coverage to Codecov"
+    - name: 📤 Upload coverage to Codecov
       uses: codecov/codecov-action@v5
       if: matrix.python == '3.12'
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
   python-publish:
-    name: "🚀 Publish Python wheels"
+    name: 🚀 Publish Python wheels
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     needs:
     - python-build
@@ -152,17 +152,17 @@ jobs:
     permissions:
       id-token: write
     steps:
-    - name: "📥 Check-out"
+    - name: 📥 Check-out
       uses: actions/checkout@v4
-    - name: "📥 Download Python wheels"
+    - name: 📥 Download Python wheels
       uses: actions/download-artifact@v4
       with:
         name: wheels
         path: dist
-    - name: "🚀 Publish Python wheels"
+    - name: 🚀 Publish Python wheels
       uses: pypa/gh-action-pypi-publish@release/v1
   github-release:
-    name: "🚀 Create GitHub release"
+    name: 🚀 Create GitHub release
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     needs:
     - python-build
@@ -174,14 +174,14 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-    - name: "📥 Check-out"
+    - name: 📥 Check-out
       uses: actions/checkout@v4
-    - name: "📥 Download Python wheels"
+    - name: 📥 Download Python wheels
       uses: actions/download-artifact@v4
       with:
         name: wheels
         path: dist
-    - name: "🚀 Create GitHub release"
+    - name: 🚀 Create GitHub release
       uses: softprops/action-gh-release@v2
       with:
         name: Release ${{ github.ref_name }}
