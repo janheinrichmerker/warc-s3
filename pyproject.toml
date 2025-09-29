@@ -36,7 +36,7 @@ tests =[
     "boto3-stubs[s3]~=1.28",
     "mypy~=1.6",
     "pytest>=7.2,<9.0",
-    "pytest-cov>=4,<7",
+    "pytest-cov>=4,<8",
     "ruff>=0.2.1,<0.14.0",
     "types-tqdm~=4.66",
 ]
