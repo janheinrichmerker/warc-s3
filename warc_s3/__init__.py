@@ -76,6 +76,8 @@ def _write_records(
     max_file_size: int,
     max_file_records: Optional[int],
 ) -> Iterator[_WarcS3Record]:
+    records = iter(records)
+
     # Write WARC info record.
     with GzipFile(fileobj=file, mode="wb") as gzip_file:
         writer = WARCWriter(gzip_file, gzip=False)
