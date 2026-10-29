@@ -188,7 +188,10 @@ class WarcS3Store(AbstractContextManager):
     def _create_bucket_if_needed(self) -> None:
         try:
             self.client.head_bucket(Bucket=self.bucket_name)
-        except self.client.exceptions.NoSuchBucket:
+        except self.client.exceptions.ClientError as e:
+            # HeadBucket has no response body, so we only get the status code.
+            if e.response["Error"]["Code"] not in ("404", "NoSuchBucket"):
+                raise e
             try:
                 self.client.create_bucket(Bucket=self.bucket_name)
             except self.client.exceptions.BucketAlreadyOwnedByYou:
