@@ -238,7 +238,13 @@ class WarcS3Store(AbstractContextManager):
                     offset_records,
                 )
                 # Consume iterator to write records to buffer.
-                saved_records = iter(list(saved_records))
+                saved_records_list = list(saved_records)
+                if len(saved_records_list) == 0:
+                    raise ValueError(
+                        "Record does not fit into a single WARC file of max "
+                        f"size {self.max_file_size} bytes."
+                    )
+                saved_records = iter(saved_records_list)
                 tmp_file.flush()
                 tmp_file.seek(0)
 
