@@ -44,7 +44,9 @@ def _client_config() -> Optional[Config]:
     # which breaks many S3-compatible stores (see
     # https://github.com/boto/boto3/issues/3738). Only use checksums when
     # required. Older botocore versions do not know these options.
-    botocore_version_parts = tuple(int(part) for part in botocore_version.split(".")[:2])
+    botocore_version_parts = tuple(
+        int(part) for part in botocore_version.split(".")[:2]
+    )
     if botocore_version_parts < (1, 36):
         return None
     return Config(
@@ -188,10 +190,10 @@ class WarcS3Store(AbstractContextManager):
     def _create_bucket_if_needed(self) -> None:
         try:
             self.client.head_bucket(Bucket=self.bucket_name)
-        except self.client.exceptions.ClientError as e:
+        except self.client.exceptions.ClientError as error:
             # HeadBucket has no response body, so we only get the status code.
-            if e.response["Error"]["Code"] not in ("404", "NoSuchBucket"):
-                raise e
+            if error.response["Error"]["Code"] not in ("404", "NoSuchBucket"):
+                raise error
             try:
                 self.client.create_bucket(Bucket=self.bucket_name)
             except self.client.exceptions.BucketAlreadyOwnedByYou:
@@ -205,10 +207,10 @@ class WarcS3Store(AbstractContextManager):
                 Bucket=self.bucket_name,
                 Key=key,
             )
-        except self.client.exceptions.ClientError as e:
-            if e.response["Error"]["Code"] == "404":
+        except self.client.exceptions.ClientError as error:
+            if error.response["Error"]["Code"] == "404":
                 return False
-            raise e
+            raise error
         return True
 
     def write(self, records: Iterable[WarcRecord]) -> Iterator[WarcS3Record]:
