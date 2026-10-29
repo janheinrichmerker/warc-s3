@@ -21,6 +21,8 @@ from uuid import uuid4
 from warnings import warn
 
 from boto3 import Session
+from botocore import __version__ as botocore_version
+from botocore.config import Config
 from more_itertools import spy, before_and_after
 from tqdm.auto import tqdm
 from warcio import ArchiveIterator, WARCWriter
@@ -35,6 +37,20 @@ _S3CFG_PATH = Path("~/.s3cfg").expanduser()
 
 _DEFAULT_MAX_FILE_SIZE: int = 1_000_000_000  # 1GB
 _DEFAULT_MAX_FILE_RECORDS: Optional[int] = None
+
+
+def _client_config() -> Optional[Config]:
+    # Since botocore 1.36, checksums are calculated and validated by default,
+    # which breaks many S3-compatible stores (see
+    # https://github.com/boto/boto3/issues/3738). Only use checksums when
+    # required. Older botocore versions do not know these options.
+    botocore_version_parts = tuple(int(part) for part in botocore_version.split(".")[:2])
+    if botocore_version_parts < (1, 36):
+        return None
+    return Config(
+        request_checksum_calculation="when_required",
+        response_checksum_validation="when_required",
+    )
 
 
 class WarcS3Location(NamedTuple):
@@ -164,6 +180,7 @@ class WarcS3Store(AbstractContextManager):
             endpoint_url=self.endpoint_url,
             aws_access_key_id=access_key,
             aws_secret_access_key=secret_key,
+            config=_client_config(),
         )
 
     def _create_bucket_if_needed(self) -> None:
