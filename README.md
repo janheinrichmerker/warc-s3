@@ -42,10 +42,9 @@ pip install -e .[tests]
 You can now verify your changes against the test suite.
 
 ```shell
-ruff check .                   # Code format and LINT
-mypy .                         # Static typing
-bandit -c pyproject.toml -r .  # Security
-pytest .                       # Unit tests
+ruff check .  # Code format, LINT, and security
+mypy .        # Static typing
+pytest .      # Unit tests
 ```
 
 Please also add tests for your newly developed code.

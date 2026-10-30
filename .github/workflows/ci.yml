@@ -84,32 +84,6 @@ jobs:
       run: pip install .[tests]
     - name: 🔍 Check Python static typing
       run: mypy .
-  python-security:
-    name: 🔍 Check Python code security
-    strategy:
-      matrix:
-        python:
-        - "3.8"
-        - "3.9"
-        - "3.10"
-        - "3.11"
-        - "3.12"
-    runs-on: ubuntu-latest
-    steps:
-    - name: 📥 Check-out
-      uses: actions/checkout@v5
-    - name: 🧰 Install Protoc
-      run: sudo apt install protobuf-compiler
-    - name: 🧰 Install Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{ matrix.python }}
-        cache: pip
-        cache-dependency-path: pyproject.toml
-    - name: 🧰 Install dependencies
-      run: pip install .[tests]
-    - name: 🔍 Check Python code security
-      run: bandit -c pyproject.toml -r .
   python-test:
     name: 🧪 Test Python code
     strategy:
@@ -146,7 +120,6 @@ jobs:
     - python-build
     - python-code-check
     - python-typing
-    - python-security
     - python-test
     runs-on: ubuntu-latest
     permissions:
@@ -168,7 +141,6 @@ jobs:
     - python-build
     - python-code-check
     - python-typing
-    - python-security
     - python-test
     permissions:
       contents: write

@@ -16,7 +16,7 @@ _CREDENTIAL = "test"
 
 def _payload(index: int, payload_size: int = 100) -> bytes:
     # Random payload, so that compression does not shrink it much.
-    return Random(index).getrandbits(  # nosec B311
+    return Random(index).getrandbits(  # noqa: S311
         8 * payload_size
     ).to_bytes(payload_size, "big")
 
