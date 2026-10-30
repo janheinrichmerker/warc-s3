@@ -63,7 +63,13 @@ def test_write_records_contiguous_locations() -> None:
             max_file_records=None,
         )
     )
-    assert [written_record.record for written_record in written] == records
+    assert [
+        written_record.record.rec_headers.get_header("WARC-Target-URI")
+        for written_record in written
+    ] == [f"https://example.com/{i}" for i in range(5)]
+    assert [
+        written_record.record.content_stream().read() for written_record in written
+    ] == [_payload(i) for i in range(5)]
     locations = [written_record.location for written_record in written]
     assert all(location is not None for location in locations)
     for previous, current in zip(locations, locations[1:]):
@@ -85,7 +91,13 @@ def test_write_records_max_file_records() -> None:
             max_file_records=2,
         )
     )
-    assert [written_record.record for written_record in written] == records
+    assert [
+        written_record.record.rec_headers.get_header("WARC-Target-URI")
+        for written_record in written
+    ] == [f"https://example.com/{i}" for i in range(5)]
+    assert [
+        written_record.record.content_stream().read() for written_record in written
+    ] == [_payload(i) for i in range(5)]
     assert [written_record.location is not None for written_record in written] == [
         True, True, False, False, False
     ]
@@ -109,6 +121,9 @@ def test_write_records_max_file_size() -> None:
     assert [written_record.location is not None for written_record in written] == [
         True, True, False, False, False
     ]
+    assert [
+        written_record.record.content_stream().read() for written_record in written
+    ] == [_payload(i, 1_000) for i in range(5)]
 
 
 def test_write_records_warns_low_max_file_size() -> None:
@@ -149,6 +164,7 @@ def test_write_and_read(store: WarcS3Store) -> None:
     assert len(written) == 3
     assert len({written_record.location.key for written_record in written}) == 1
     for i, written_record in enumerate(written):
+        assert written_record.record.content_stream().read() == _payload(i)
         with store.read(written_record.location) as read_record:
             assert (
                 read_record.rec_headers.get_header("WARC-Target-URI")

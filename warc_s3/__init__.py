@@ -100,12 +100,16 @@ def _write_records(
         location: Optional[WarcS3Location]
         offset = file.tell()
 
-        # Write record to buffer.
+        # Write record to temporary buffer.
         with BytesIO() as record_buffer:
             with GzipFile(fileobj=record_buffer, mode="wb") as record_gzip_buffer:
                 writer = WARCWriter(record_gzip_buffer, gzip=False)
                 writer.write_record(record)
             record_bytes = record_buffer.getvalue()
+
+        # Writing the record to a temporary buffer consumed its payload stream.
+        # Re-read the record from the buffer, to keep its payload readable.
+        record = next(iter(ArchiveIterator(BytesIO(record_bytes))))
 
         # Check if record does not into file.
         if offset + len(record_bytes) > max_file_size:
