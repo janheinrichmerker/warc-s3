@@ -12,6 +12,7 @@ from typing import (
     NamedTuple,
     Iterable,
     Iterator,
+    Generator,
     TYPE_CHECKING,
     Any,
     Optional,
@@ -271,7 +272,7 @@ class WarcS3Store(AbstractContextManager):
             head, records = spy(records)
 
     @contextmanager
-    def read(self, location: WarcS3Location) -> Iterator[WarcRecord]:
+    def read(self, location: WarcS3Location) -> Generator[WarcRecord, None, None]:
         end_offset = location.offset + location.length - 1
         response = self.client.get_object(
             Bucket=self.bucket_name,
