@@ -15,7 +15,6 @@ from typing import (
     Any,
     Optional,
     Sequence,
-    MutableSequence,
 )
 from uuid import uuid4
 from warnings import warn
@@ -97,8 +96,7 @@ def _write_records(
     else:
         records_slice = islice(records, max_file_records)
     for record in records_slice:
-        record_buffer: MutableSequence[_WarcS3Record] = []
-
+        location: Optional[WarcS3Location]
         offset = file.tell()
         with TemporaryFile() as tmp_file:
             # Write record to temporary file.
@@ -113,23 +111,19 @@ def _write_records(
             if offset + length > max_file_size:
                 # Does not fit, so break and return all remaining records
                 # without location.
-                record_buffer.append(_WarcS3Record(record=record, location=None))
-                break
-
-            # Write temporary file to file.
-            file.write(tmp_file.read())
-
-            rec = _WarcS3Record(
-                record=record,
-                location=WarcS3Location(
+                location = None
+            else:
+                # Write temporary file to file.
+                file.write(tmp_file.read())
+                location = WarcS3Location(
                     key=key,
                     offset=offset,
                     length=length,
-                ),
-            )
-            record_buffer.append(rec)
+                )
 
-        yield from record_buffer
+        yield _WarcS3Record(record=record, location=location)
+        if location is None:
+            break
 
     for record in records:
         yield _WarcS3Record(record=record, location=None)
