@@ -3,6 +3,7 @@ from contextlib import AbstractContextManager, contextmanager
 from dataclasses import dataclass
 from functools import cached_property
 from gzip import GzipFile
+from io import BytesIO
 from itertools import islice
 from pathlib import Path
 from tempfile import TemporaryFile
@@ -98,28 +99,27 @@ def _write_records(
     for record in records_slice:
         location: Optional[WarcS3Location]
         offset = file.tell()
-        with TemporaryFile() as tmp_file:
-            # Write record to temporary file.
-            with GzipFile(fileobj=tmp_file, mode="wb") as tmp_gzip_file:
-                writer = WARCWriter(tmp_gzip_file, gzip=False)
-                writer.write_record(record)
-            tmp_file.flush()
-            length = tmp_file.tell()
-            tmp_file.seek(0)
 
-            # Check if record does not into file.
-            if offset + length > max_file_size:
-                # Does not fit, so break and return all remaining records
-                # without location.
-                location = None
-            else:
-                # Write temporary file to file.
-                file.write(tmp_file.read())
-                location = WarcS3Location(
-                    key=key,
-                    offset=offset,
-                    length=length,
-                )
+        # Write record to buffer.
+        with BytesIO() as record_buffer:
+            with GzipFile(fileobj=record_buffer, mode="wb") as record_gzip_buffer:
+                writer = WARCWriter(record_gzip_buffer, gzip=False)
+                writer.write_record(record)
+            record_bytes = record_buffer.getvalue()
+
+        # Check if record does not into file.
+        if offset + len(record_bytes) > max_file_size:
+            # Does not fit, so break and return all remaining records
+            # without location.
+            location = None
+        else:
+            # Write record to file.
+            file.write(record_bytes)
+            location = WarcS3Location(
+                key=key,
+                offset=offset,
+                length=len(record_bytes),
+            )
 
         yield _WarcS3Record(record=record, location=location)
         if location is None:
